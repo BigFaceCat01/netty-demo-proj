@@ -15,7 +15,7 @@ public class NIOFile {
 
     public static void fileTest(){
         try (
-                RandomAccessFile file = new RandomAccessFile("D:/data.txt", "r")
+                RandomAccessFile file = new RandomAccessFile("D:/data.txt", "r");
         ) {
             ByteBuffer buffer = ByteBuffer.allocate(64);
             FileChannel channel = file.getChannel();
