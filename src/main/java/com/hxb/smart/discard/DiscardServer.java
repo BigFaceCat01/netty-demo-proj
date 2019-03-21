@@ -19,11 +19,17 @@ import io.netty.handler.ssl.util.SelfSignedCertificate;
  * @date 2019-03-19 17:22:30
  */
 public class DiscardServer {
-    private static final String LOCALHOST = "127.0.0.1";
-    private static final int DEFAULT_PORT = 19090;
+    static final String LOCALHOST = "127.0.0.1";
+    static final int DEFAULT_PORT = 19090;
     private String host;
     private int port;
     static final boolean SSL = System.getProperty("ssl") != null;
+
+    static ChannelFuture f;
+
+    public static void main(String[] args) throws Exception {
+        new DiscardServer().launch();
+    }
 
     public DiscardServer(String host,int port){
         this.host = host;
@@ -44,10 +50,10 @@ public class DiscardServer {
         }
 
         EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup worderGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, worderGroup)
+            b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(new ChannelInitializer<SocketChannel>() {
@@ -61,12 +67,12 @@ public class DiscardServer {
                         }
                     });
 
-            ChannelFuture f = b.bind(host,port).sync();
+            f = b.bind(host,port).sync();
 
             f.channel().closeFuture().sync();
         }finally {
             bossGroup.shutdownGracefully();
-            worderGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
         }
 
     }
