@@ -1,5 +1,6 @@
 package com.hxb.smart.http.html;
 
+import com.hxb.smart.tomcat.protocol.HttpResponse;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
@@ -56,6 +57,20 @@ public class HtmlBuilder {
 
         //4.0 给模板绑定数据模型
         Writer out = new OutputStreamWriter(is);
+        template.process(root, out);
+    }
+
+    public static void build(String resource, HttpResponse response) throws Exception{
+        init();
+
+        //2.0 创建数据模型
+        Map<String, Object> root = new HashMap<>();
+
+        //3.0 获取模板
+        Template template = cfg.getTemplate(resource);
+
+        //4.0 给模板绑定数据模型
+        Writer out = new OutputStreamWriter(response.getOutputStream());
         template.process(root, out);
     }
 }

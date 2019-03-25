@@ -17,6 +17,8 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.CharsetUtil;
 
 import java.io.*;
+import java.util.Scanner;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @author Created by huang xiao bao
@@ -35,8 +37,8 @@ public class ShellServer {
             out.flush(); //写到控制台
 
             PrintStream printStream = new PrintStream(System.out);
-
             new Thread(()->{
+
                 boolean b = false;
                 try (InputStream inputStream = exec.getInputStream();) {
                         for(;;){
@@ -56,6 +58,17 @@ public class ShellServer {
                 }catch (Exception e){
                     e.printStackTrace();
 
+                }
+            }).start();
+            new Thread(()->{
+                Scanner scanner = new Scanner(System.in);
+                while (true){
+                    String c = scanner.nextLine();
+                    if("quit".equalsIgnoreCase(c)){
+                        break;
+                    }
+                    out.println(c+"\r\n"); //输入你的命令
+                    out.flush(); //写到控制台
                 }
             }).start();
             Thread.sleep(500);
