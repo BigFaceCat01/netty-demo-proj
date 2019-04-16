@@ -20,5 +20,9 @@ public abstract class AbstractServer {
         this.port = port;
     }
 
-    public abstract void launch();
+    /**
+     * 启动服务
+     * @throws Exception 异常
+     */
+    public abstract void launch() throws Exception;
 }

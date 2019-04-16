@@ -5,8 +5,10 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.ServerSocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
 /**
@@ -16,24 +18,22 @@ import io.netty.handler.logging.LoggingHandler;
 public class SimpleServer extends AbstractServer {
 
     @Override
-    public void launch() {
+    public void launch() throws Exception{
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workGroup = new NioEventLoopGroup();
 
         ServerBootstrap bootstrap = new ServerBootstrap();
 
-        bootstrap.channel(ServerSocketChannel.class)
+        bootstrap.channel(NioServerSocketChannel.class)
                 .group(bossGroup,workGroup)
                 .option(ChannelOption.SO_BACKLOG,100)
-                .handler(new LoggingHandler())
-                .childHandler(new ChannelInitializer() {
-                    @Override
-                    protected void initChannel(Channel ch) throws Exception {
-                        ChannelPipeline pipeline = ch.pipeline();
-                        pipeline.addLast(new StringEncoder())
-                                .addLast(new StringDecoder());
-                    }
-                })
-                .bind(this.host,this.port);
+                .handler(new LoggingHandler(LogLevel.INFO))
+                .childHandler(new MessageInitializer());
+        try {
+            bootstrap.bind(this.host,this.port).sync().channel().closeFuture().sync();
+        } finally {
+            bossGroup.shutdownGracefully();
+            workGroup.shutdownGracefully();
+        }
     }
 }

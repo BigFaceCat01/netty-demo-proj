@@ -1,14 +1,14 @@
 package com.hxb.smart.http;
 
-import com.hxb.smart.http.html.HtmlBuilder;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.CharsetUtil;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URLDecoder;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * @author Created by huang xiao bao
@@ -42,7 +42,7 @@ public class ShellServerHandler extends SimpleChannelInboundHandler<String> {
                 if(s1.trim().equals("/")){
                     ctx.write(responseHeaderHtml);
                     ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
-                    HtmlBuilder.build(bos);
+//                    HtmlBuilder.build(bos);
                     ctx.write("Content-Length: "+ bos.size());
                     ctx.write("\n\n");
 
