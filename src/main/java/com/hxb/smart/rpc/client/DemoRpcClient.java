@@ -1,16 +1,16 @@
 package com.hxb.smart.rpc.client;
 
 import com.hxb.smart.constant.Constant;
+import com.hxb.smart.rpc.codec.SimpleDecode;
+import com.hxb.smart.rpc.codec.SimpleEncode;
+import com.hxb.smart.rpc.model.SimpleRpcResponse;
+import com.hxb.smart.rpc.serializer.AbstractSerializer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpRequestEncoder;
-import io.netty.handler.codec.http.HttpResponseDecoder;
 
 /**
  * @author Created by huang xiao bao
@@ -24,19 +24,17 @@ public class DemoRpcClient {
 
         client.group(workGroup)
                 .channel(NioSocketChannel.class)
-                .option(ChannelOption.SO_BACKLOG,100)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline pipeline = ch.pipeline();
-                        pipeline.addLast(new HttpResponseDecoder())
-                                .addLast(new HttpRequestEncoder())
-                                .addLast(new HttpObjectAggregator(5*1024*1024))
+                        pipeline.addLast(new SimpleDecode(SimpleRpcResponse.class,AbstractSerializer.SerializeEnum.HESSIAN))
+                                .addLast(new SimpleEncode(AbstractSerializer.SerializeEnum.HESSIAN))
                                 .addLast(new DemoRpcClientHandler());
                     }
                 });
         try{
-            client.connect(Constant.LOCAL_HOST,Constant.PORT)
+            client.connect("192.168.10.28",Constant.PORT)
                     .sync()
                     .channel()
                     .closeFuture()

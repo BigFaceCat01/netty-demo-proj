@@ -1,16 +1,19 @@
 package com.hxb.smart.rpc.server;
 
 import com.hxb.smart.constant.Constant;
+import com.hxb.smart.rpc.codec.SimpleDecode;
+import com.hxb.smart.rpc.codec.SimpleEncode;
+import com.hxb.smart.rpc.model.SimpleRpcRequest;
+import com.hxb.smart.rpc.model.SimpleRpcResponse;
+import com.hxb.smart.rpc.serializer.AbstractSerializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ServerChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpRequestDecoder;
-import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
@@ -28,13 +31,12 @@ public class DemoRpcServer {
                 .channel(NioServerSocketChannel.class)
                 .option(ChannelOption.SO_BACKLOG,100)
                 .handler(new LoggingHandler(LogLevel.INFO))
-                .childHandler(new ChannelInitializer<ServerChannel>() {
+                .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    protected void initChannel(ServerChannel ch) throws Exception {
+                    protected void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline pipeline = ch.pipeline();
-                        pipeline.addLast(new HttpRequestDecoder())
-                                .addLast(new HttpResponseEncoder())
-                                .addLast(new HttpObjectAggregator(5*1024*1024))
+                        pipeline.addLast(new SimpleDecode(SimpleRpcRequest.class,AbstractSerializer.SerializeEnum.HESSIAN))
+                                .addLast(new SimpleEncode(AbstractSerializer.SerializeEnum.HESSIAN))
                                 .addLast(new DemoRpcServerHandler());
                     }
                 });
