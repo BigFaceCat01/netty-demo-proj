@@ -17,6 +17,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
+import java.net.InetSocketAddress;
+
 /**
  * @author Created by huang xiao bao
  * @date 2019-05-06 17:19:45
@@ -41,7 +43,7 @@ public class DemoRpcServer {
                     }
                 });
         try {
-            server.bind(Constant.LOCAL_HOST, Constant.PORT)
+            server.bind(new InetSocketAddress("192.168.10.148",Constant.PORT))
                     .channel()
                     .closeFuture()
                     .sync();

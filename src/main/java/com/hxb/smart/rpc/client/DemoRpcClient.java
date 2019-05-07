@@ -12,6 +12,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+import java.net.InetSocketAddress;
+
 /**
  * @author Created by huang xiao bao
  * @date 2019-05-06 17:20:21
@@ -34,7 +36,7 @@ public class DemoRpcClient {
                     }
                 });
         try{
-            client.connect("192.168.10.28",Constant.PORT)
+            client.connect((new InetSocketAddress("192.168.10.148",Constant.PORT)))
                     .sync()
                     .channel()
                     .closeFuture()
