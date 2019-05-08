@@ -4,13 +4,11 @@ import com.hxb.smart.constant.Constant;
 import com.hxb.smart.rpc.codec.SimpleDecode;
 import com.hxb.smart.rpc.codec.SimpleEncode;
 import com.hxb.smart.rpc.model.SimpleRpcRequest;
-import com.hxb.smart.rpc.model.SimpleRpcResponse;
 import com.hxb.smart.rpc.serializer.AbstractSerializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
-import io.netty.channel.ServerChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -43,7 +41,7 @@ public class DemoRpcServer {
                     }
                 });
         try {
-            server.bind(new InetSocketAddress("192.168.10.148",Constant.PORT))
+            server.bind(new InetSocketAddress("192.168.20.198",Constant.PORT))
                     .channel()
                     .closeFuture()
                     .sync();

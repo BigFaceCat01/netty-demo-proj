@@ -36,7 +36,7 @@ public class DemoRpcClient {
                     }
                 });
         try{
-            client.connect((new InetSocketAddress("192.168.10.148",Constant.PORT)))
+            client.connect((new InetSocketAddress("192.168.20.198",Constant.PORT)))
                     .sync()
                     .channel()
                     .closeFuture()

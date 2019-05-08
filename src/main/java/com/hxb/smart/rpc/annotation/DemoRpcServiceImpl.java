@@ -12,4 +12,9 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface DemoRpcServiceImpl {
+    /**
+     * 这里若实现类接口有多个则可以指定有效的接口，默认第零个接口,注意：须填写全类名
+     * @return 接口类名
+     */
+    String[] value() default {};
 }
