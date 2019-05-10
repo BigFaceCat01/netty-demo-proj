@@ -1,5 +1,6 @@
 package com.hxb.smart.rpc.model;
 
+import com.hxb.smart.rpc.invoker.RpcInvokerFactory;
 import lombok.Builder;
 import lombok.Data;
 
@@ -17,4 +18,5 @@ public class SimpleRpcRequest implements Serializable {
     private String methodName;
     private Class<?>[] methodParam;
     private Object[] params;
+
 }

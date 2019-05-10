@@ -1,6 +1,7 @@
 package com.hxb.smart.rpc.invoker;
 
 import com.hxb.smart.rpc.base.BeanRegistry;
+import com.hxb.smart.rpc.base.RpcConfig;
 import com.hxb.smart.rpc.base.ServiceRegistry;
 import com.hxb.smart.rpc.model.SimpleRpcFutureResponse;
 import com.hxb.smart.rpc.model.SimpleRpcResponse;
@@ -29,11 +30,17 @@ public class RpcInvokerFactory {
 
 
 
+    public static RpcInvokerFactoryBuilder builder(){
+        return new RpcInvokerFactoryBuilder();
+    }
 
-
-
-
-
+    public static class RpcInvokerFactoryBuilder{
+        void config(String configPath){}
+        void config(RpcConfig rpcConfig){}
+        ThreadPoolExecutor taskPool(ThreadPoolExecutor taskPool){
+            return null;
+        }
+    }
 
 
 
