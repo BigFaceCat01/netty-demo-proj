@@ -11,4 +11,9 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface DemoRpcService {
+    /**
+     *
+     * @return service name
+     */
+    String serviceName();
 }

@@ -7,6 +7,6 @@ import java.util.List;
  * @author Created by huang xiao bao
  * @date 2019-05-09 17:40:04
  */
-public interface ServiceRegistry {
-    List<Class<?>> scan();
+public interface ServiceRegistry extends LifeCycle{
+    List<ServiceInstance> get(String serviceName);
 }

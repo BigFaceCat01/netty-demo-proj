@@ -1,15 +1,44 @@
 package com.hxb.smart.rpc.invoker;
 
+import com.hxb.smart.rpc.base.BeanRegistry;
+import com.hxb.smart.rpc.base.ServiceRegistry;
 import com.hxb.smart.rpc.model.SimpleRpcFutureResponse;
 import com.hxb.smart.rpc.model.SimpleRpcResponse;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author Created by huang xiao bao
  * @date 2019-05-07 16:20:34
  */
 public class RpcInvokerFactory {
+    /**
+     * 获得注册服务
+     */
+    private ServiceRegistry serviceRegistry;
+    /**
+     * 获得注册的bean
+     */
+    private BeanRegistry beanRegistry;
+    /**
+     * 执行任务的线程池
+     */
+    private ThreadPoolExecutor taskPool;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private static final RpcInvokerFactory RPC_INVOKER_FACTORY = new RpcInvokerFactory();
     public static RpcInvokerFactory getInstance(){
         return RPC_INVOKER_FACTORY;

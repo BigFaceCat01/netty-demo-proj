@@ -1,25 +1,26 @@
 package com.hxb.smart.rpc.base;
 
-import com.hxb.smart.rpc.annotation.DemoRpcService;
-import com.hxb.structure.util.ClassScanUtil;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Created by huang xiao bao
  * @date 2019-05-09 17:54:25
  */
-public class DefaultServiceRegistry extends AbstractServiceRegistry {
+public class DefaultServiceRegistry implements ServiceRegistry {
+    private RpcConfig rpcConfig;
 
     @Override
-    public List<Class<?>> scan() {
-        List<Class<?>> classes = new ArrayList<>();
-        ClassScanUtil.scan("com.hxb", source -> {
-            if(source.isAnnotationPresent(DemoRpcService.class)){
-                classes.add(source);
-            }
-        });
-        return classes;
+    public List<ServiceInstance> get(String serviceName) {
+        return rpcConfig.get(serviceName);
+    }
+
+    @Override
+    public void init() {
+
+    }
+
+    @Override
+    public void destroy() {
+
     }
 }
