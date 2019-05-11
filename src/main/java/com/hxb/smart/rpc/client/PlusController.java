@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2019-05-07 11:27:11
  */
 public class PlusController implements Runnable{
-    @DemoRpcService
+    @DemoRpcService(serviceName = "")
     private HelloService helloService;
     private Scanner scanner;
     private ChannelHandlerContext ctx;

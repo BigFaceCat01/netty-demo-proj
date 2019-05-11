@@ -11,7 +11,7 @@ public class DefaultServiceRegistry implements ServiceRegistry {
 
     @Override
     public List<ServiceInstance> get(String serviceName) {
-        return rpcConfig.get(serviceName);
+        return null;
     }
 
     @Override

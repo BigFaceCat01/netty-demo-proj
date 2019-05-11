@@ -1,4 +1,4 @@
-package com.hxb.smart.rpc.model;
+package com.hxb.smart.rpcv2.core.net.param;
 
 import com.hxb.smart.rpc.base.DefaultBeanRegistry;
 import com.hxb.smart.rpc.base.DefaultServiceRegistry;
@@ -14,7 +14,7 @@ import java.io.Serializable;
  */
 @Data
 @Builder
-public class SimpleRpcRequest implements Serializable {
+public class RpcRequest implements Serializable {
     private Long requestId;
     private String className;
     private String methodName;

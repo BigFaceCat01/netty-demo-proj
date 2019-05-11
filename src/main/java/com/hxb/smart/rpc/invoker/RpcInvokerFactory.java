@@ -28,42 +28,31 @@ public class RpcInvokerFactory {
     private ThreadPoolExecutor taskPool;
 
 
-
-
-    public static RpcInvokerFactoryBuilder builder(){
-        return new RpcInvokerFactoryBuilder();
+    public static RpcInvokerFactory.RpcInvokerFactoryBuilder builder() {
+        return new RpcInvokerFactory.RpcInvokerFactoryBuilder();
     }
-
-    public static class RpcInvokerFactoryBuilder{
-        void config(String configPath){}
-        void config(RpcConfig rpcConfig){}
-        ThreadPoolExecutor taskPool(ThreadPoolExecutor taskPool){
-            return null;
-        }
-    }
-
 
 
 
 
     private static final RpcInvokerFactory RPC_INVOKER_FACTORY = new RpcInvokerFactory();
-    public static RpcInvokerFactory getInstance(){
+
+    public static RpcInvokerFactory getInstance() {
         return RPC_INVOKER_FACTORY;
     }
-    private RpcInvokerFactory(){
 
-    }
-    private ConcurrentHashMap<Long,SimpleRpcFutureResponse> futureResponsePool = new ConcurrentHashMap<>(32);
 
-    public void setInvokerFuture(Long requestId, SimpleRpcFutureResponse futureResponse){
+    private ConcurrentHashMap<Long, SimpleRpcFutureResponse> futureResponsePool = new ConcurrentHashMap<>(32);
+
+    public void setInvokerFuture(Long requestId, SimpleRpcFutureResponse futureResponse) {
         futureResponsePool.put(requestId, futureResponse);
     }
 
-    public void removeInvokerFuture(Long requestId){
+    public void removeInvokerFuture(Long requestId) {
         futureResponsePool.remove(requestId);
     }
 
-    public void notifyInvokerFuture(Long requestId, final SimpleRpcResponse simpleRpcResponse){
+    public void notifyInvokerFuture(Long requestId, final SimpleRpcResponse simpleRpcResponse) {
 
         // get
         final SimpleRpcFutureResponse futureResponse = futureResponsePool.get(requestId);
@@ -75,6 +64,39 @@ public class RpcInvokerFactory {
 
         // do remove
         removeInvokerFuture(requestId);
+
+    }
+
+
+    public static class RpcInvokerFactoryBuilder {
+        private RpcConfig rpcConfig;
+
+        public RpcInvokerFactoryBuilder config(String configPath) {
+            return this;
+        }
+
+        public RpcInvokerFactoryBuilder config(RpcConfig rpcConfig) {
+            return this;
+        }
+
+        public RpcInvokerFactoryBuilder taskPool(ThreadPoolExecutor taskPool) {
+            return this;
+        }
+
+        public RpcInvokerFactoryBuilder serviceRegistry(ServiceRegistry serviceRegistry) {
+            return this;
+        }
+
+        public RpcInvokerFactoryBuilder beanRegistry(BeanRegistry beanRegistry) {
+            return this;
+        }
+
+        public RpcInvokerFactory build() {
+            return null;
+        }
+    }
+
+    private RpcInvokerFactory() {
 
     }
 }
