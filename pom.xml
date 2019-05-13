@@ -48,6 +48,14 @@
         </dependency>
 
         <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <dependency>
             <groupId>com.hxb</groupId>
             <artifactId>data-structure-core</artifactId>
             <version>${data.structure.version}</version>
