@@ -52,6 +52,7 @@ public class NettyServer extends AbstractServer {
         this.channel = server.bind(new InetSocketAddress(host, port))
                 .sync()
                 .channel();
+        channel.closeFuture().sync();
     }
 
     @Override

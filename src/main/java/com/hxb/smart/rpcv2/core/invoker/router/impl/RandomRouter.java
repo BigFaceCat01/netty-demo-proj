@@ -11,18 +11,13 @@ import java.util.Random;
  * @date 2019-05-11 18:10:27
  */
 public class RandomRouter implements Router {
-    private ServiceRegistry serviceRegistry;
     private Random random = new Random();
 
     @Override
-    public String router(String serviceName, Strategy strategy) {
+    public String router(String serviceName,ServiceRegistry serviceRegistry) {
         List<String> serviceInstances = serviceRegistry.get(serviceName);
         int size = serviceInstances.size();
         int r = random.nextInt(size);
         return serviceInstances.get(r);
-    }
-
-    public RandomRouter(ServiceRegistry serviceRegistry) {
-        this.serviceRegistry = serviceRegistry;
     }
 }

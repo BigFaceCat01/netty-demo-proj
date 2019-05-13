@@ -21,6 +21,7 @@ public class RpcFactory {
     private RpcInvokerFactory rpcInvokerFactory;
     private RpcConfig rpcConfig;
     private RpcProviderFactory rpcProviderFactory;
+    private volatile boolean initialize;
 
 
 
@@ -29,16 +30,29 @@ public class RpcFactory {
     }
 
     private void init(){
-        initInvokerFactory();
+        if(initialize){
+            return;
+        }
+        synchronized (RpcFactory.class) {
+            if (initialize) {
+                return;
+            }
+            initInvokerFactory();
 
-        initServiceRegistry();
+            initServiceRegistry();
 
-        initProviderFactory();
+            if(rpcConfig.getPort() != -1) {
+                initProviderFactory();
+            }
+
+            initialize = true;
+        }
     }
 
 
     private void initInvokerFactory(){
-        rpcInvokerFactory = new RpcInvokerFactory(rpcConfig.getNetType().getClientImpl(),rpcConfig.getRouter());
+        rpcInvokerFactory = new RpcInvokerFactory(rpcConfig);
+
     }
 
     private void initProviderFactory(){
@@ -75,11 +89,10 @@ public class RpcFactory {
     public static class RpcFactoryBuilder{
         private RpcConfig rpcConfig;
 
-        public RpcFactoryBuilder config(String configPath){
-            this.rpcConfig = RpcConfig.builder().build();
+        public RpcFactoryBuilder config(RpcConfig rpcConfig){
+            this.rpcConfig = rpcConfig;
             return this;
         }
-
 
         public RpcFactory build(){
             return new RpcFactory(this.rpcConfig);
@@ -97,6 +110,10 @@ public class RpcFactory {
 
     public ServiceRegistry getServiceRegistry() {
         return rpcConfig.getServiceRegistry();
+    }
+
+    public RpcProviderFactory getRpcProviderFactory() {
+        return rpcProviderFactory;
     }
 
     private RpcFactory(RpcConfig rpcConfig){

@@ -20,8 +20,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequest> 
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RpcRequest msg) throws Exception {
+        log.info("收到RPC调用：{}",msg);
         RpcResponse invoke = invoke(msg);
-
+        log.info("返回结果：{}",invoke);
         ctx.writeAndFlush(invoke);
     }
 

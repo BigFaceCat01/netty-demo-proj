@@ -9,10 +9,12 @@ import com.hxb.smart.rpcv2.core.net.impl.netty.client.NettyConnectClient;
 import com.hxb.smart.rpcv2.core.net.param.RpcFutureResponse;
 import com.hxb.smart.rpcv2.core.net.param.RpcRequest;
 import com.hxb.smart.rpcv2.core.net.param.RpcResponse;
+import com.hxb.smart.rpcv2.registry.ServiceRegistry;
 import com.hxb.smart.rpcv2.serializer.AbstractSerializer;
 import com.hxb.smart.rpcv2.util.ThrowableUtil;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -28,42 +30,38 @@ public class RpcInvokerFactory {
     private volatile ThreadPoolExecutor callbackExecutor;
     private Class<? extends AbstractConnect> connectImpl;
     private AbstractSerializer serializer;
+    private ServiceRegistry serviceRegistry;
 
     public void asyncSend(RpcRequest rpcRequest, String serviceName, BaseCallback callback) {
-        String address = router.router(serviceName,Router.Strategy.RANDOM);
+        String address = router.router(serviceName, serviceRegistry);
         RpcFutureResponse rpcFutureResponse = new RpcFutureResponse();
         try {
-            client.send(address,rpcRequest,serializer,connectImpl,this);
-            setInvokerFuture(rpcRequest.getRequestId(),rpcFutureResponse);
+            client.send(address, rpcRequest, serializer, connectImpl, this);
+            setInvokerFuture(rpcRequest.getRequestId(), rpcFutureResponse);
             RpcResponse rpcResponse = rpcFutureResponse.get(100, TimeUnit.MILLISECONDS);
-            callbackExecutor.execute(()-> callback.run(rpcResponse));
-        }catch (TimeoutException e) {
-            log.error("invoke time out : {}",rpcRequest,e);
-        }catch (Exception e){
-            log.error("invoke error : {}",rpcRequest,e);
+            callbackExecutor.execute(() -> callback.run(rpcResponse));
+        } catch (TimeoutException e) {
+            log.error("invoke time out : {}", rpcRequest, e);
+        } catch (Exception e) {
+            log.error("invoke error : {}", rpcRequest, e);
         }
     }
 
     public Object syncSend(RpcRequest rpcRequest, String serviceName) {
-        String address = router.router(serviceName,Router.Strategy.RANDOM);
+        String address = router.router(serviceName, serviceRegistry);
         RpcFutureResponse rpcFutureResponse = new RpcFutureResponse();
         try {
-            client.send(address,rpcRequest,serializer,NettyConnectClient.class,this);
-            setInvokerFuture(rpcRequest.getRequestId(),rpcFutureResponse);
-            return rpcFutureResponse.get(100, TimeUnit.MILLISECONDS);
-        }catch (TimeoutException e) {
-            log.error("invoke time out : {}",rpcRequest,e);
-            return RpcResponse.builder()
-                            .exception(ThrowableUtil.toString(e))
-                            .requestId(rpcRequest.getRequestId())
-                            .build();
-        }catch (Exception e){
-            log.error("invoke error : {}",rpcRequest,e);
-            return RpcResponse.builder()
-                    .exception(ThrowableUtil.toString(e))
-                    .requestId(rpcRequest.getRequestId())
-                    .build();
+            client.send(address, rpcRequest, serializer, connectImpl, this);
+            setInvokerFuture(rpcRequest.getRequestId(), rpcFutureResponse);
+            RpcResponse rpcResponse = rpcFutureResponse.get(100, TimeUnit.MILLISECONDS);
+            log.info("调用结果：{}",rpcResponse);
+            return rpcResponse.getResult();
+        } catch (TimeoutException e) {
+            log.error("invoke time out : {}", rpcRequest, e);
+        } catch (Exception e) {
+            log.error("invoke error : {}", rpcRequest, e);
         }
+        return null;
     }
 
 
@@ -89,15 +87,16 @@ public class RpcInvokerFactory {
 
     }
 
-    public void init(){
+    public void init() {
         this.futureResponsePool = new ConcurrentHashMap<>(32);
 
         ThreadFactory executeFactory = new ThreadFactory() {
             private String prefix = "callback execute pool-thread";
             private AtomicInteger count = new AtomicInteger(1);
+
             @Override
             public Thread newThread(Runnable r) {
-                return new Thread(r,prefix + count.getAndIncrement());
+                return new Thread(r, prefix + count.getAndIncrement());
             }
         };
         this.callbackExecutor = new ThreadPoolExecutor(
@@ -105,12 +104,16 @@ public class RpcInvokerFactory {
                 15,
                 3,
                 TimeUnit.MINUTES,
-                new ArrayBlockingQueue<>(64),executeFactory);
+                new ArrayBlockingQueue<>(64), executeFactory);
     }
 
-    public RpcInvokerFactory(AbstractClient client, Router router,RpcConfig rpcConfig) {
-        this.client = client;
-        this.router = router;
+    public RpcInvokerFactory(RpcConfig rpcConfig) {
+        this.client = rpcConfig.getNetType().getClientImpl();
+        this.router = rpcConfig.getRouter();
         this.serializer = rpcConfig.getSerializer();
+        this.serviceRegistry = rpcConfig.getServiceRegistry();
+        this.connectImpl = rpcConfig.getNetType().getConnectImpl();
+
+        init();
     }
 }

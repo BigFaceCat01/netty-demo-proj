@@ -31,7 +31,7 @@ public class InvokerProxyBean {
             throw new RpcException(source.getName() + ": RpcApi not present");
         }
         RpcRequest rpcRequest = RpcRequest.builder()
-                .className(source.getSimpleName())
+                .className(source.getName())
                 .build();
         rpcFactory.getServiceRegistry().refreshData(rpcApi.serviceName(),rpcApi.address());
         return new InvokerProxyBean(
@@ -40,7 +40,7 @@ public class InvokerProxyBean {
                 ,rpcRequest,
                 resultCallBack,
                 Objects.isNull(resultCallBack),
-                source.getInterfaces());
+                new Class<?>[]{source});
     }
 
     public static InvokerProxyBean newProxyBean(Class<?> source,RpcFactory rpcFactory){
@@ -62,7 +62,7 @@ public class InvokerProxyBean {
                         rpcRequest.setRequestId(SnowFlakesUtil.nextId());
                         rpcRequest.setMethodName(method.getName());
                         rpcRequest.setMethodParam(method.getParameterTypes());
-                        rpcRequest.setParams(method.getParameterTypes());
+                        rpcRequest.setParams(args);
                         if (sync) {
                             //同步调用
                             return rpcInvokerFactory.syncSend(rpcRequest, serviceName);

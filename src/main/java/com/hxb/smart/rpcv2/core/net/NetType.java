@@ -48,15 +48,7 @@ public enum NetType {
         }
     }
 
-    public AbstractConnect getConnectImpl() {
-        synchronized (this.connectImpl){
-            try {
-                return connectImpl.newInstance();
-            } catch (Exception e) {
-                log.error(e.getMessage(),e);
-                return null;
-            }
-        }
+    public Class<? extends AbstractConnect> getConnectImpl() {
+        return connectImpl;
     }
-
 }
