@@ -1,7 +1,5 @@
 package com.hxb.smart.rpcv2.registry;
 
-import com.hxb.smart.rpc.base.ServiceInstance;
-
 import java.util.List;
 
 /**
@@ -10,4 +8,12 @@ import java.util.List;
  */
 public interface ServiceRegistry {
     List<String> get(String serviceName);
+
+    void refreshData(String serviceName,String address);
+
+    void refreshData(String serviceName,List<String> address);
+
+    void start();
+
+    void destroy();
 }

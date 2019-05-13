@@ -1,12 +1,13 @@
 package com.hxb.smart.rpcv2.configuration;
 
 import com.hxb.smart.rpc.base.Resource;
-import com.hxb.smart.rpc.base.ServiceInstance;
-import com.hxb.smart.rpc.enums.RegistryType;
 import com.hxb.smart.rpc.model.RpcProxyBean;
+import com.hxb.smart.rpcv2.core.invoker.router.Router;
+import com.hxb.smart.rpcv2.core.net.NetType;
+import com.hxb.smart.rpcv2.registry.ServiceRegistry;
+import com.hxb.smart.rpcv2.serializer.AbstractSerializer;
 import lombok.Data;
 
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -16,26 +17,35 @@ import java.util.concurrent.ConcurrentHashMap;
 @Data
 public class RpcConfig {
     private String registryCenterAddress;
+    private int port;
     private String token;
-    private ConcurrentHashMap<String,List<ServiceInstance>> registryConfig;
     private ConcurrentHashMap<String,RpcProxyBean> proxyBeanConfig;
     private boolean initialize;
     private Resource resource;
+    private String basePackage;
     private int timeout;
+    private Router router;
+    private ServiceRegistry serviceRegistry;
+    private NetType netType;
+    private AbstractSerializer serializer;
 
-    public void init(){
-
-    }
-
-    public List<ServiceInstance> getRegistry(String serviceName){
-        return registryConfig.get(serviceName);
-    }
 
     public RpcProxyBean getProxyBean(String interfaceName){
         return proxyBeanConfig.get(interfaceName);
     }
 
+    public static RpcConfig.RpcConfigBuilder builder(){
+        return new RpcConfig.RpcConfigBuilder();
+    }
 
+    public static class RpcConfigBuilder{
 
-    private RpcConfig(){}
+        public RpcConfig build(){
+            return new RpcConfig();
+        }
+    }
+
+    private RpcConfig(){
+        this.proxyBeanConfig = new ConcurrentHashMap<>(32);
+    }
 }

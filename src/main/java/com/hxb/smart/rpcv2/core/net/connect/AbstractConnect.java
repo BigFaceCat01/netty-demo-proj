@@ -1,5 +1,6 @@
 package com.hxb.smart.rpcv2.core.net.connect;
 
+import com.hxb.smart.rpcv2.core.invoker.RpcInvokerFactory;
 import com.hxb.smart.rpcv2.core.net.param.RpcRequest;
 import com.hxb.smart.rpcv2.serializer.AbstractSerializer;
 
@@ -15,7 +16,7 @@ public abstract class AbstractConnect {
     private static ConcurrentHashMap<String, AbstractConnect> connectPool;
     private static ConcurrentHashMap<String, Object> lockPool = new ConcurrentHashMap<>(16);
 
-    public abstract void init(String address, AbstractSerializer serializer) throws Exception;
+    public abstract void init(String address, AbstractSerializer serializer,RpcInvokerFactory rpcInvokerFactory) throws Exception;
 
     public abstract void close();
 
@@ -24,13 +25,13 @@ public abstract class AbstractConnect {
     public abstract boolean isAlive();
 
 
-    public static void doSend(String address, RpcRequest rpcRequest, Class<? extends AbstractConnect> connectImpl) throws Exception {
-        AbstractConnect connect = getConnect(address, connectImpl);
+    public static void doSend(String address, RpcRequest rpcRequest, AbstractSerializer serializer, Class<? extends AbstractConnect> connectImpl, RpcInvokerFactory rpcInvokerFactory) throws Exception {
+        AbstractConnect connect = getConnect(address, serializer, connectImpl,rpcInvokerFactory);
         connect.send(rpcRequest);
     }
 
 
-    private static AbstractConnect getConnect(String address, Class<? extends AbstractConnect> connectImpl) throws Exception {
+    private static AbstractConnect getConnect(String address, AbstractSerializer serializer, Class<? extends AbstractConnect> connectImpl, RpcInvokerFactory rpcInvokerFactory) throws Exception {
 
         if (Objects.isNull(connectPool)) {
             synchronized (AbstractConnect.class) {
@@ -39,28 +40,28 @@ public abstract class AbstractConnect {
         }
 
         AbstractConnect connect = connectPool.get(address);
-        if(Objects.nonNull(connect) && connect.isAlive()){
+        if (Objects.nonNull(connect) && connect.isAlive()) {
             return connect;
         }
         Object lock = lockPool.get(address);
-        if(Objects.isNull(lock)){
-            lockPool.putIfAbsent(address,new Object());
+        if (Objects.isNull(lock)) {
+            lockPool.putIfAbsent(address, new Object());
             lock = lockPool.get(address);
         }
 
-        synchronized (lock){
+        synchronized (lock) {
             connect = connectPool.get(address);
-            if(Objects.nonNull(connect) && connect.isAlive()){
+            if (Objects.nonNull(connect) && connect.isAlive()) {
                 return connect;
             }
-            if(Objects.nonNull(connect)){
+            if (Objects.nonNull(connect)) {
                 //表示isAlive为false，移除有问题的通道
                 connect.close();
                 connectPool.remove(address);
             }
             AbstractConnect con = connectImpl.newInstance();
-            con.init(address,null);
-            connectPool.put(address,con);
+            con.init(address, serializer,rpcInvokerFactory);
+            connectPool.put(address, con);
             return con;
         }
     }

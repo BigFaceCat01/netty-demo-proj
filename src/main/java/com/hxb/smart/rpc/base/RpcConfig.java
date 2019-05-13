@@ -2,7 +2,6 @@ package com.hxb.smart.rpc.base;
 
 import com.hxb.smart.rpc.enums.RegistryType;
 import com.hxb.smart.rpc.model.RpcProxyBean;
-import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;

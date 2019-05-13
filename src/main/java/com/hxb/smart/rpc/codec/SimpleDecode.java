@@ -1,6 +1,5 @@
 package com.hxb.smart.rpc.codec;
 
-import com.hxb.smart.rpc.model.SimpleRpcRequest;
 import com.hxb.smart.rpc.serializer.AbstractSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

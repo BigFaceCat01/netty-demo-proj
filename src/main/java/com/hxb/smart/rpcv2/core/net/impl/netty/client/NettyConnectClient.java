@@ -1,7 +1,6 @@
 package com.hxb.smart.rpcv2.core.net.impl.netty.client;
 
-import com.hxb.smart.rpc.client.DemoRpcClientHandler;
-import com.hxb.smart.rpc.model.SimpleRpcResponse;
+import com.hxb.smart.rpcv2.core.invoker.RpcInvokerFactory;
 import com.hxb.smart.rpcv2.core.net.connect.AbstractConnect;
 import com.hxb.smart.rpcv2.core.net.impl.netty.protocol.impl.NettyDecode;
 import com.hxb.smart.rpcv2.core.net.impl.netty.protocol.impl.NettyEncode;
@@ -30,7 +29,7 @@ public class NettyConnectClient extends AbstractConnect {
     private Channel channel;
 
     @Override
-    public void init(String address, AbstractSerializer serializer) throws Exception{
+    public void init(String address, AbstractSerializer serializer, RpcInvokerFactory rpcInvokerFactory) throws Exception{
         Object[] ipPort = IpUtil.parseIpPort(address);
         String host = (String) ipPort[0];
         int port = (int) ipPort[1];
@@ -48,7 +47,7 @@ public class NettyConnectClient extends AbstractConnect {
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(new NettyDecode(RpcResponse.class, serializer))
                                 .addLast(new NettyEncode(serializer))
-                                .addLast(new NettyClientHandler(null));
+                                .addLast(new NettyClientHandler(rpcInvokerFactory));
                     }
                 });
         this.channel = client.connect((new InetSocketAddress(host, port)))
@@ -58,7 +57,8 @@ public class NettyConnectClient extends AbstractConnect {
 
     @Override
     public void close() {
-
+        workGroup.shutdownGracefully();
+        this.channel.close();
     }
 
     @Override
@@ -68,6 +68,6 @@ public class NettyConnectClient extends AbstractConnect {
 
     @Override
     public boolean isAlive() {
-        return false;
+        return channel.isActive();
     }
 }

@@ -1,7 +1,6 @@
 package com.hxb.smart.http;
 
 import com.hxb.smart.constant.Constant;
-import com.hxb.smart.file.FileServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -16,9 +15,10 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.CharsetUtil;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Scanner;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @author Created by huang xiao bao

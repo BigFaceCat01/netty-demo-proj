@@ -11,4 +11,10 @@ import java.lang.annotation.*;
 @Inherited
 public @interface RpcApi {
     String serviceName();
+
+    /**
+     * 服务提供者ip+port  如：127.0.0.1:8080
+     * @return
+     */
+    String address() default "";
 }

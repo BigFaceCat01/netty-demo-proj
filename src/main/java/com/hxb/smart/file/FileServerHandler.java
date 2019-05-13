@@ -2,7 +2,6 @@ package com.hxb.smart.file;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.stream.ChunkedFile;
 
 import java.io.RandomAccessFile;

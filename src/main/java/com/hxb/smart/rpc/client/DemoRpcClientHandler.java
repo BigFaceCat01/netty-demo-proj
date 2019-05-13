@@ -1,6 +1,5 @@
 package com.hxb.smart.rpc.client;
 
-import ch.qos.logback.classic.Logger;
 import com.hxb.smart.rpc.invoker.RpcInvokerFactory;
 import com.hxb.smart.rpc.model.SimpleRpcResponse;
 import io.netty.channel.ChannelHandlerContext;

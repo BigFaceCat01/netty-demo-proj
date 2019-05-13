@@ -4,6 +4,7 @@ import com.hxb.smart.rpcv2.core.net.AbstractServer;
 import com.hxb.smart.rpcv2.core.net.impl.netty.protocol.impl.NettyDecode;
 import com.hxb.smart.rpcv2.core.net.impl.netty.protocol.impl.NettyEncode;
 import com.hxb.smart.rpcv2.core.net.param.RpcRequest;
+import com.hxb.smart.rpcv2.core.provider.RpcProviderFactory;
 import com.hxb.smart.rpcv2.serializer.AbstractSerializer;
 import com.hxb.smart.rpcv2.util.IpUtil;
 import io.netty.bootstrap.ServerBootstrap;
@@ -26,7 +27,7 @@ public class NettyServer extends AbstractServer {
     private Channel channel;
 
     @Override
-    public void init(String address, AbstractSerializer serializer) throws Exception {
+    public void init(String address, AbstractSerializer serializer, RpcProviderFactory rpcProviderFactory) throws Exception {
         Object[] ipPort = IpUtil.parseIpPort(address);
         String host = (String) ipPort[0];
         int port = (int) ipPort[1];
@@ -45,11 +46,18 @@ public class NettyServer extends AbstractServer {
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(new NettyDecode(RpcRequest.class, serializer))
                                 .addLast(new NettyEncode(serializer))
-                                .addLast(new NettyServerHandler());
+                                .addLast(new NettyServerHandler(rpcProviderFactory));
                     }
                 });
         this.channel = server.bind(new InetSocketAddress(host, port))
                 .sync()
                 .channel();
+    }
+
+    @Override
+    public void close(){
+        this.workGroup.shutdownGracefully();
+        this.bossGroup.shutdownGracefully();
+        this.channel.close();
     }
 }

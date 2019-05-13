@@ -21,4 +21,8 @@ public class RandomRouter implements Router {
         int r = random.nextInt(size);
         return serviceInstances.get(r);
     }
+
+    public RandomRouter(ServiceRegistry serviceRegistry) {
+        this.serviceRegistry = serviceRegistry;
+    }
 }

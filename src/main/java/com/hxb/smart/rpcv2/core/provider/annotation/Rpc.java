@@ -10,4 +10,9 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Inherited
 public @interface Rpc {
+    /**
+     * 若有多个接口，需指定接口名称，默认取第一个接口
+     * @return
+     */
+    String iface() default "";
 }

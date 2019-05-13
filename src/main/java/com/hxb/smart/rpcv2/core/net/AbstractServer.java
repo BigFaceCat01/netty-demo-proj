@@ -1,6 +1,6 @@
 package com.hxb.smart.rpcv2.core.net;
 
-import com.hxb.smart.rpcv2.core.callback.BaseCallback;
+import com.hxb.smart.rpcv2.core.provider.RpcProviderFactory;
 import com.hxb.smart.rpcv2.serializer.AbstractSerializer;
 
 /**
@@ -8,14 +8,8 @@ import com.hxb.smart.rpcv2.serializer.AbstractSerializer;
  * @date 2019-05-11 11:09:20
  */
 public abstract class AbstractServer {
-    private BaseCallback startCallBack;
-    private BaseCallback stopCallBack;
 
-    public abstract void init(String address, AbstractSerializer serializer) throws Exception;
+    public abstract void init(String address, AbstractSerializer serializer, RpcProviderFactory rpcProviderFactory) throws Exception;
+    public abstract void close();
 
-    public void start(){}
-
-    public void onStart(){
-
-    }
 }

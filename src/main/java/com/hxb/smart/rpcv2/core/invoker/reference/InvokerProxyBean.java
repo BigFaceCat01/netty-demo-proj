@@ -33,12 +33,14 @@ public class InvokerProxyBean {
         RpcRequest rpcRequest = RpcRequest.builder()
                 .className(source.getSimpleName())
                 .build();
+        rpcFactory.getServiceRegistry().refreshData(rpcApi.serviceName(),rpcApi.address());
         return new InvokerProxyBean(
                 rpcFactory.getRpcInvokerFactory()
                 ,rpcApi.serviceName()
                 ,rpcRequest,
                 resultCallBack,
-                Objects.isNull(resultCallBack));
+                Objects.isNull(resultCallBack),
+                source.getInterfaces());
     }
 
     public static InvokerProxyBean newProxyBean(Class<?> source,RpcFactory rpcFactory){
@@ -49,24 +51,29 @@ public class InvokerProxyBean {
         if(Objects.nonNull(proxyBean)){
             return proxyBean;
         }
-        this.proxyBean = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-                interfaces,
-                (proxy, method, args) -> {
-                    RpcRequest rpcRequest = getRpcRequest();
-                    rpcRequest.setRequestId(SnowFlakesUtil.nextId());
-                    rpcRequest.setMethodName(method.getName());
-                    rpcRequest.setMethodParam(method.getParameterTypes());
-                    rpcRequest.setParams(method.getParameterTypes());
-                    if(sync){
-                        //同步调用
-                        return rpcInvokerFactory.syncSend(rpcRequest,serviceName);
-                    }else {
-                        //异步调用
-                        rpcInvokerFactory.asyncSend(rpcRequest,serviceName,callback);
-                        return null;
-                    }
-                });
-        return proxyBean;
+        synchronized (InvokerProxyBean.class) {
+            if(Objects.nonNull(proxyBean)){
+                return proxyBean;
+            }
+            this.proxyBean = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
+                    interfaces,
+                    (proxy, method, args) -> {
+                        RpcRequest rpcRequest = getRpcRequest();
+                        rpcRequest.setRequestId(SnowFlakesUtil.nextId());
+                        rpcRequest.setMethodName(method.getName());
+                        rpcRequest.setMethodParam(method.getParameterTypes());
+                        rpcRequest.setParams(method.getParameterTypes());
+                        if (sync) {
+                            //同步调用
+                            return rpcInvokerFactory.syncSend(rpcRequest, serviceName);
+                        } else {
+                            //异步调用
+                            rpcInvokerFactory.asyncSend(rpcRequest, serviceName, callback);
+                            return null;
+                        }
+                    });
+            return proxyBean;
+        }
 
     }
 
@@ -74,11 +81,12 @@ public class InvokerProxyBean {
         return rpcRequest;
     }
 
-    private InvokerProxyBean(RpcInvokerFactory rpcInvokerFactory, String serviceName, RpcRequest rpcRequest,BaseCallback callback,boolean sync){
+    private InvokerProxyBean(RpcInvokerFactory rpcInvokerFactory, String serviceName, RpcRequest rpcRequest,BaseCallback callback,boolean sync,Class<?>[] interfaces){
         this.rpcInvokerFactory = rpcInvokerFactory;
         this.serviceName = serviceName;
         this.rpcRequest = rpcRequest;
         this.callback = callback;
         this.sync = sync;
+        this.interfaces = interfaces;
     }
 }

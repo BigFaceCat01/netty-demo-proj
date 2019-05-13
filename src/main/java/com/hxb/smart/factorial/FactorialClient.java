@@ -9,7 +9,6 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 
-import static com.hxb.smart.constant.Constant.COUNT;
 import static com.hxb.smart.constant.Constant.LOCAL_HOST;
 import static com.hxb.smart.constant.Constant.PORT;
 
